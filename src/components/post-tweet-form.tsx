@@ -1,5 +1,7 @@
+import { addDoc, collection } from "firebase/firestore";
 import React, { useState } from "react";
 import { styled } from "styled-components";
+import { auth, db } from "../firebase";
 
 const Form = styled.form`
   display: flex;
@@ -77,8 +79,27 @@ export default function PostTweetForm() {
       setFile(files[0]); //그 후에 배열의 첫번째 파일을 file state에 저장
     }
   };
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user || isLoading || tweet === "" || tweet.length > 180) return;
+    try {
+      setLoading(true);
+      // Firebase SDK에 포함된 addDoc이라는 함수 사용
+      await addDoc(collection(db, "tweets"), {
+        tweet,
+        createdAt: Date.now(),
+        username: user.displayName || "Anonymous",
+        userId: user.uid,
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
         rows={5}
         maxLength={180}
