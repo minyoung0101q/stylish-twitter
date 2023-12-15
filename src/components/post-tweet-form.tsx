@@ -95,10 +95,7 @@ export default function PostTweetForm() {
       });
       if (file) {
         //업로드된 파일이 저장되는 폴더 명과 파일명 지정 가능
-        const locationRef = ref(
-          storage,
-          `tweets/${user.uid}-${user.displayName}/${doc.id}`
-        );
+        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`);
         const result = await uploadBytes(locationRef, file);
         const url = await getDownloadURL(result.ref); //방금 업로드한 사진의 URL이 생김
         await updateDoc(doc, {
